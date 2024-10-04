@@ -23,4 +23,20 @@ public class AnonymousDbContext : DbContext
     public virtual DbSet<ChatUser> ChatUsers { get; set; }
     public virtual DbSet<ChatMessage> ChatMessages { get; set; }
     public virtual DbSet<ChatGuess> ChatGuesses { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Define composite key for ChatDetail (ChatId, UserId)
+        modelBuilder.Entity<ChatDetail>()
+            .HasKey(cd => new { cd.ChatId, cd.UserId });
+
+        // Define composite key for ChatUser (ChatId, UserId)
+        modelBuilder.Entity<ChatUser>()
+            .HasKey(cu => new { cu.ChatId, cu.UserId });
+
+        // Define composite key for GroupDetail (GroupId, UserID)
+        modelBuilder.Entity<GroupDetail>()
+            .HasKey(gd => new { gd.GroupId, gd.UserID });
+    }
+
 }
