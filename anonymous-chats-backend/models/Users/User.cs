@@ -19,4 +19,5 @@ public class User : BaseModel
     [MaxLength(255)]
     [EmailAddress]
     public string Email { get; set; }
+
 }
