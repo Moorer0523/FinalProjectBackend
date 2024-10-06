@@ -11,8 +11,7 @@ namespace anonymous_chats_backend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-//commenting out until we have authorization done
-//[Authorize]
+[Authorize]
 
 public class UserController : ApiBaseController
 {
