@@ -14,7 +14,7 @@ namespace anonymous_chats_backend.Controllers;
 //commenting out until we have authorization done
 //[Authorize]
 
-public class UserController : ControllerBase
+public class UserController : ApiBaseController
 {
     private readonly AnonymousDbContext _context;
 
@@ -47,13 +47,16 @@ public class UserController : ControllerBase
 
     // POST api/<UserController>
     [HttpPost]
-    public async Task<IActionResult> CreateUser([FromBody] User user)
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserDTO user)
     {
-        //Not sure if we want to use a DTO here as we're using all of the user attributes anyway. Cant find real clear convention from my googling.
+        user.Id = GetCurrentUserID();
         if (await _context.Users.FindAsync(user.Id) != null)
             return BadRequest(user);
 
-        _context.Users.Add(user);
+        User newUser = new();
+        newUser.CreateToUser(user, GetCurrentUserID());
+
+        _context.Users.Add(newUser);
         await _context.SaveChangesAsync();
 
         return CreatedAtAction("GetUser", new { id = user.Id }, user);
@@ -61,19 +64,19 @@ public class UserController : ControllerBase
 
     // PUT api/<UserController>/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDTO updatedUserDTO)
+    public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDTO updatedUserDTO)
     {
         try
         {
             var currentUser = _context.Users.Find(id);
 
             if (updatedUserDTO == null)
-                BadRequest();
+                return BadRequest();
 
             if (currentUser == null)
                 return NotFound();
 
-            currentUser.updateUser(updatedUserDTO);
+            currentUser.UpdateToUser(updatedUserDTO, GetCurrentUserID());
             _context.Users.Update(currentUser);
             await _context.SaveChangesAsync();
         }
@@ -91,14 +94,15 @@ public class UserController : ControllerBase
 
     // DELETE api/<UserController>/5
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteUser(int id)
+    public async Task<IActionResult> DeleteUser(string id)
     {
         try
         {
-            if (await _context.Users.FindAsync(id) == null)
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
                 return NotFound();
 
-            _context.Remove(id);
+            _context.Users.Remove(user);
             await _context.SaveChangesAsync();
         }
         catch (DBConcurrencyException)
