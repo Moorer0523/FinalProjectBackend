@@ -3,13 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace anonymous_chats_backend.Models.Users;
 
-public class User : BaseModel
+public class UpdateUserDTO
 {
-    [Key, DatabaseGenerated(DatabaseGeneratedOption.None)] // Disabled auto increment
-    [Required]
-    [MaxLength(255)]
-    public string Id { get; set; }
-
     [Required]
     [MinLength(8)]
     [MaxLength(24)]
@@ -19,5 +14,20 @@ public class User : BaseModel
     [MaxLength(255)]
     [EmailAddress]
     public string Email { get; set; }
+}
 
+public class CreateUserDTO
+{
+    [Required]
+    [MaxLength(255)]
+    public string Id { get; set; } 
+    [Required]
+    [MinLength(8)]
+    [MaxLength(24)]
+    public string UserName { get; set; }
+
+    [Required]
+    [MaxLength(255)]
+    [EmailAddress]
+    public string Email { get; set; }
 }
