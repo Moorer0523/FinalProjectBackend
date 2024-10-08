@@ -15,9 +15,8 @@ public class ChatGuess : BaseModel
     [MaxLength(255)]
     public string GuesserId { get; set; }
 
-    [Required]
     [MaxLength(255)]
-    public string GuesseeId { get; set; }
+    public string? GuesseeId { get; set; } = null;
 
     [Required]
     [MaxLength(255)]
