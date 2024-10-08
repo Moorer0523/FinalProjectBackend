@@ -14,7 +14,7 @@ public static class UserExtensions
 
     public static void CreateToUser(this User user, CreateUserDTO createUserDTO, string authorUsername)
     {
-        user.Id = createUserDTO.Id;
+        user.Id = authorUsername;
         user.Email = createUserDTO.Email;
         user.UserName = createUserDTO.UserName;
         user.CreatedBy = authorUsername;
