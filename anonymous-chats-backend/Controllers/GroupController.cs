@@ -2,6 +2,7 @@
 using anonymous_chats_backend.Models.Groups;
 using anonymous_chats_backend.Models.Users;
 using anonymous_chats_backend.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
 using Group = anonymous_chats_backend.Models.Groups.Group;
@@ -12,6 +13,7 @@ namespace anonymous_chats_backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class GroupController : ApiBaseController
     {
         private readonly GroupService _groupService;
