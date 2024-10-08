@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using anonymous_chats_backend.Data;
 
@@ -11,9 +12,11 @@ using anonymous_chats_backend.Data;
 namespace anonymous_chats_backend.Migrations
 {
     [DbContext(typeof(AnonymousDbContext))]
-    partial class AnonymousDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241008163330_nullFieldUpdate")]
+    partial class nullFieldUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
