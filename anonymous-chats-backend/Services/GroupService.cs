@@ -1,7 +1,9 @@
 ﻿using anonymous_chats_backend.Data;
 using anonymous_chats_backend.Models.Groups;
 using anonymous_chats_backend.Models.Users;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 
 namespace anonymous_chats_backend.Services;
 
@@ -37,10 +39,35 @@ public class GroupService(AnonymousDbContext context)
 
         foreach (var user in createGroupDTO.UserNames)
         {
-            await _context.GroupDetails.AddAsync(new() { GroupId = group.Id, UserID = user });
+            await _context.GroupDetails.AddAsync(new() { GroupId = group.Id, UserID = user, CreatedBy = authorUsername});
         }
+        await _context.SaveChangesAsync();
         return group;
     }
 
-    //public async Task<Group> UpdateGroup(UpdateGroupDTO updateGroupDTO, )
+    public async Task<Group> UpdateGroup(int id, UpdateGroupDTO updateGroupDTO, string authorUsername)
+    {
+        var group = await _context.Groups.FindAsync(id);
+        if (group == null)
+            return null;
+
+        group.UpdateToGroup(updateGroupDTO, authorUsername);
+
+        _context.Update(group);
+        await _context.SaveChangesAsync();
+
+        return group;
+        
+    }
+
+    public async Task<bool> DeleteGroup(int id, string authorUsername)
+    {
+        var group = await _context.Groups.FindAsync(id);
+        if (group == null)
+            return false;
+            
+        _context.Groups.Remove(group);
+        await _context.SaveChangesAsync();
+        return true;
+    }
 }

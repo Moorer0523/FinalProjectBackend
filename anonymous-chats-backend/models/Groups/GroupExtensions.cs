@@ -11,7 +11,7 @@ public static class GroupExtensions
         group.StartDate = createGroupDTO.StartDate;
         group.EndDate = createGroupDTO.EndDate;
         group.CreatedBy = authorUsername;
-        group.CreatedOn = DateTime.Now;
+        group.CreatedOn = DateTime.UtcNow;
     }
 
     public static void UpdateToGroup(this Group group, UpdateGroupDTO updateGroupDTO, string authorUsername)
@@ -20,7 +20,7 @@ public static class GroupExtensions
         group.StartDate = updateGroupDTO.StartDate;
         group.EndDate = updateGroupDTO.EndDate;
         group.UpdatedBy = authorUsername;
-        group.UpdatedOn = DateTime.Now;
+        group.UpdatedOn = DateTime.UtcNow;
     }
 
 }
