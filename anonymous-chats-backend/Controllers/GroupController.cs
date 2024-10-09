@@ -30,7 +30,7 @@ public class GroupController : ApiBaseController
 
         if (group == null)
             return NotFound();
-        return Ok();
+        return Ok(group);
     }
     // GET api/<GroupController>/5
     [HttpGet("GetUserGroups/{userId}")]
@@ -40,7 +40,7 @@ public class GroupController : ApiBaseController
 
         if (group == null)
             return NotFound();
-        return Ok(await _groupService.GetGroupsForUser(userId));
+        return Ok(group);
     }
 
     [HttpGet("GetGroupUsers/{groupId}")]
