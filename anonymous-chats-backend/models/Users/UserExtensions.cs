@@ -8,16 +8,16 @@ public static class UserExtensions
         user.UserName = updateUserDTO.UserName;
 
         user.UpdatedBy = authorUsername;
-        user.UpdatedOn = DateTime.Now;
+        user.UpdatedOn = DateTime.UtcNow;
 
     }
 
     public static void CreateToUser(this User user, CreateUserDTO createUserDTO, string authorUsername)
     {
-        user.Id = createUserDTO.Id;
+        user.Id = authorUsername;
         user.Email = createUserDTO.Email;
         user.UserName = createUserDTO.UserName;
         user.CreatedBy = authorUsername;
-        user.CreatedOn = DateTime.Now;
+        user.CreatedOn = DateTime.UtcNow;
     }
 }

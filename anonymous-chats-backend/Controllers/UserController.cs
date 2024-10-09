@@ -48,8 +48,8 @@ public class UserController : ApiBaseController
     [HttpPost]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserDTO user)
     {
-        user.Id = GetCurrentUserID();
-        if (await _context.Users.FindAsync(user.Id) != null)
+
+        if (await _context.Users.FindAsync(GetCurrentUserID()) != null)
             return BadRequest(user);
 
         User newUser = new();
@@ -58,7 +58,7 @@ public class UserController : ApiBaseController
         _context.Users.Add(newUser);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction("GetUser", new { id = user.Id }, user);
+        return CreatedAtAction("GetUser", new { id = newUser.Id }, newUser);
     }
 
     // PUT api/<UserController>/5
