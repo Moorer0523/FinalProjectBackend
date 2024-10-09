@@ -23,6 +23,17 @@ public class GroupService(AnonymousDbContext context)
         return await _context.Groups.Where(x => groupDetailIds.Contains(x.Id)).ToListAsync();
     }
 
+    public async Task<List<User>> GetUsersFromGroup(int groupId)
+    {
+        string[] userIds = _context.GroupDetails
+            .Where(x => x.GroupId == groupId)
+            .Select(x => x.UserID).ToArray();
+
+
+
+        return await _context.Users.Where(x => userIds.Contains(x.Id)).ToListAsync();
+    }
+
     public async Task<Group> CreateGroup (CreateGroupDTO createGroupDTO, string authorUsername)
     {
 

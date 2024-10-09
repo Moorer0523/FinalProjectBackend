@@ -12,7 +12,6 @@ namespace anonymous_chats_backend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
 public class ChatController : ApiBaseController
 {
     private readonly AnonymousDbContext _context;
