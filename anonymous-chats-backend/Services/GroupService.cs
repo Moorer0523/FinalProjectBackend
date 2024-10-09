@@ -37,7 +37,7 @@ public class GroupService(AnonymousDbContext context)
 
         //start for loop for iterating through users and adding them to each new object for the Group Details aspect
 
-        foreach (var user in createGroupDTO.UserNames)
+        foreach (var user in createGroupDTO.UserIds)
         {
             await _context.GroupDetails.AddAsync(new() { GroupId = group.Id, UserID = user, CreatedBy = authorUsername});
         }

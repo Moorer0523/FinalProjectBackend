@@ -19,7 +19,7 @@ public class CreateGroupDTO()
     public DateTime EndDate { get; set; }
 
     [Required]
-    public List<string> UserNames { get; set; } //Need to make a user or group DTO that pulls in the username from when they add it into the create group page
+    public List<string> UserIds { get; set; } //Need to make a user or group DTO that pulls in the username from when they add it into the create group page
 }
 
 public class UpdateGroupDTO()
