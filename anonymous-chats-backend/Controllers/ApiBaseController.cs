@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -6,6 +7,7 @@ namespace anonymous_chats_backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize] --REMOVE AFTER MVP
     public class ApiBaseController : ControllerBase
     {
         protected string GetCurrentUserID()
