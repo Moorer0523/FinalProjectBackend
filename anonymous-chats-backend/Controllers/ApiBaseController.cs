@@ -22,7 +22,8 @@ namespace anonymous_chats_backend.Controllers
                 }
             }
 
-            return null;
+            return "1";  // --REMOVE AFTER MVP
+            // return null;
         }
     }
 }
