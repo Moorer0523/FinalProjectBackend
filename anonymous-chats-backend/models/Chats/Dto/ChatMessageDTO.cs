@@ -15,8 +15,4 @@ public class CreateChatMessageDTO
     [MaxLength(500)]
     public string FilteredMessage { get; set; } = string.Empty;
 
-    [Required]
-    [MaxLength(255)]
-    public string CreatedBy { get; set; } // Auditing field
-
 }
