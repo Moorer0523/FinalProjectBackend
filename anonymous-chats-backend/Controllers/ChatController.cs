@@ -1,7 +1,9 @@
 ﻿using anonymous_chats_backend.Data;
 using anonymous_chats_backend.Models.Chats;
 using anonymous_chats_backend.Models.Chats.Dto;
+using anonymous_chats_backend.Models.Groups;
 using anonymous_chats_backend.Models.Users;
+using anonymous_chats_backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,140 +16,149 @@ namespace anonymous_chats_backend.Controllers;
 [ApiController]
 public class ChatController : ApiBaseController
 {
-    private readonly AnonymousDbContext _context;
+    private readonly ChatService _chatService;
 
     public ChatController(AnonymousDbContext context)
     {
-        _context = context;
+        _chatService = new(context);
     }
 
 
-    // GET api/<ChatController>/chats/userId=abc/groupId=2
-    [HttpGet("chats/userId={userId}/groupId={groupId}")]
+
+    // GET api/<ChatController>/Chats/userId=abc/groupId=2
+    [HttpGet("Chats/userId={userId}/groupId={groupId}")]
     public async Task<IActionResult> GetChats(string userId, int groupId)
     {
-        // Fetch all chats associated with by group
-        IQueryable<Chat> chatsByGroup = _context.Chats.Where(x => x.GroupId == groupId);
-
-        // Join ChatUsers that match the passed in userId
-        var result = from chat in chatsByGroup
-                     join user in _context.ChatUsers on
-                     chat.Id equals user.ChatId into UserChats
-                     from c in UserChats.DefaultIfEmpty()
-                     where c.UserId == userId // filter by userId
-                     select new
-                     {
-                         ChatId = chat.Id,
-                         StartDate = chat.StartDate,
-                         GroupId = groupId,
-                         UserId = userId,
-                         Pseudonym = c.Pseudonym
-                     };
-
-        return Ok(await result.ToListAsync());
-    }
-
-
-    // GET api/<ChatController>/users/5
-    [HttpGet("users/{chatId}")]
-    public async Task<IActionResult> GetChatUsers(int chatId)
-    {
-        IQueryable<ChatUser> chatUsers = _context.ChatUsers.Where(x => x.ChatId == chatId);
-
-        if (chatUsers.IsNullOrEmpty())
+        try
         {
-            return NotFound();
-        }
+            List<Chat> chats = await _chatService.GetChatsByUserAndGroupId(userId, groupId);
 
-        return Ok(await chatUsers.ToListAsync());
+            return Ok(chats);
+        }
+        catch (GroupNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
 
 
-    // GET api/<ChatController>/messages/5
-    [HttpGet("messages/{chatId}")]
+    // GET api/<ChatController>/Messages/5
+    [HttpGet("Messages/{chatId}")]
     public async Task<IActionResult> GetChatMessages(int chatId)
     {
-        IQueryable<ChatMessage> chatMessages = _context.ChatMessages.Where(x => x.ChatId == chatId);
-
-        if (chatMessages.IsNullOrEmpty())
+        // Verify chat
+        if (await _chatService.GetChatById(chatId) == null)
         {
-            return NotFound();
+            return NotFound($"Chat {chatId} could not be found");
         }
 
-        return Ok(await chatMessages.ToListAsync());
+        return Ok(await _chatService.GetChatMessages(chatId));
     }
 
 
 
-    // GET api/<ChatController>/guesses/chatId=5/guesserId=abc
-    [HttpGet("guesses/chatId={chatId}/guesserId={guesserId}")]
+    // GET api/<ChatController>/Users/5
+    [HttpGet("Users/{chatId}")]
+    public async Task<IActionResult> GetChatUsers(int chatId)
+    {
+        // Verify chat
+        if (await _chatService.GetChatById(chatId) == null)
+        {
+            return NotFound($"Chat {chatId} could not be found");
+        }
+
+        try
+        {
+            List<ChatUser> chatUsers = await _chatService.GetChatUsers(chatId);
+            return Ok(chatUsers);
+        } 
+        catch (MissingChatComponentException ex) 
+        {
+            return _chatService.InternalError(ex.Message);
+        }
+    }
+
+
+
+    // GET api/<ChatController>/Guesses/chatId=5/guesserId=abc
+    [HttpGet("Guesses/chatId={chatId}/guesserId={guesserId}")]
     public async Task<IActionResult> GetChatGuesses(int chatId, string guesserId)
     {
-        IQueryable<ChatGuess> userGuesses = _context.ChatGuesses.Where(x => x.ChatId == chatId && x.GuesserId == guesserId);
-
-        if (userGuesses.IsNullOrEmpty())
+        // Verify chat
+        if (await _chatService.GetChatById(chatId) == null)
         {
-            var customResponse = new
-            {
-                Code = 500,
-                Message = $"Could not locate internally maintained guesses for user {guesserId} in chat {chatId}"
-            };
-
-            return StatusCode(StatusCodes.Status500InternalServerError, customResponse);
+            return NotFound($"Chat {chatId} could not be found");
         }
 
-        return Ok(await userGuesses.ToListAsync());
+        try
+        {
+            List<ChatGuess>? chatGuesses = await _chatService.GetChatGuesses(chatId, guesserId);
+            return Ok(chatGuesses);
+        }
+        catch (MissingChatComponentException ex)
+        {
+            return _chatService.InternalError(ex.Message);
+        }
     }
 
 
 
-    // POST api/<ChatController>/messages
-    [HttpPost("messages")]
-    public async Task<IActionResult> CreateChatMessage([FromBody] CreateChatMessageDTO chatMessageDto)
+    // POST api/<ChatController>/Chats
+    [HttpPost("Chats")]
+    public async Task<IActionResult> CreateChats(int groupId)
     {
-        if (chatMessageDto == null)
+        try
+        {
+            List<Chat> chats = await _chatService.CreateChats(groupId, GetCurrentUserID());
+            return Ok(chats);
+        }
+        catch (Exception ex)
+        {
+            Func<string, IActionResult> responseMethod;
+            switch (ex)
+            {
+                case GroupNotFoundException:
+                    responseMethod = NotFound; break;
+                case UnauthorizedUserException:
+                    responseMethod = Unauthorized; break;
+                case GroupSizeBelowLimitException:
+                    responseMethod = UnprocessableEntity; break;
+                default:
+                    return BadRequest(ex.StackTrace);
+            }
+            return responseMethod(ex.Message);
+        }
+    }
+
+
+
+    // POST api/<ChatController>/Messages
+    [HttpPost("Messages")]
+    public async Task<IActionResult> CreateChatMessage([FromBody] CreateChatMessageDTO chatMessageDTO)
+    {
+        if (chatMessageDTO == null || !ModelState.IsValid)
         {
             return BadRequest("Invalid request body");
         }
 
-        ChatMessage msg = new ChatMessage();
-        msg.CreateToChatMessage(chatMessageDto, GetCurrentUserID());
-
-        await _context.ChatMessages.AddAsync(msg);
-        await _context.SaveChangesAsync();
+        await _chatService.CreateChatMessage(chatMessageDTO, GetCurrentUserID());
 
         return Created();
     }
 
 
 
-    // PUT api/<ChatController>/guesses
-    [HttpPut("guesses")]
-    public async Task<IActionResult> UpdateGuess([FromBody] UpdateChatGuessDTO chatGuessDTO)
+    // PUT api/<ChatController>/Guesses
+    [HttpPut("Guesses")]
+    public async Task<IActionResult> UpdateChatGuess([FromBody] UpdateChatGuessDTO chatGuessDTO)
     {
-        if (chatGuessDTO == null)
+        if (chatGuessDTO == null || !ModelState.IsValid)
         {
             return BadRequest("Invalid request body");
         }
 
-        ChatGuess? guess = await _context.ChatGuesses.FindAsync(chatGuessDTO.Id);
-
-        if (guess == null)
-        {
-            var customResponse = new
-            {
-                Code = 500,
-                Message = $"Could not locate internally maintained chatGuess {chatGuessDTO.Id}"
-            };
-
-            return StatusCode(StatusCodes.Status500InternalServerError, customResponse);
-        }
-
-        guess.UpdateToChatGuess(chatGuessDTO, GetCurrentUserID());
-
-        _context.ChatGuesses.Update(guess);
-        await _context.SaveChangesAsync();
+        await _chatService.UpdateChatGuess(chatGuessDTO, GetCurrentUserID());
 
         return NoContent();
     }

@@ -12,12 +12,4 @@ public class Group : BaseModel
     [MinLength(1)]
     [MaxLength(50)]
     public string Name { get; set; }
-
-    // If this field is missing, use current datetime as the start date
-    [DataType(DataType.DateTime)]
-    public DateTime StartDate { get; set; }
-
-    [Required]
-    [DataType(DataType.DateTime)]
-    public DateTime EndDate { get; set; }
 }

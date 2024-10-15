@@ -6,7 +6,6 @@ public static class UserExtensions
     {
         user.Email = updateUserDTO.Email;
         user.UserName = updateUserDTO.UserName;
-
         user.UpdatedBy = authorUsername;
         user.UpdatedOn = DateTime.UtcNow;
 
@@ -18,6 +17,5 @@ public static class UserExtensions
         user.Email = createUserDTO.Email;
         user.UserName = createUserDTO.UserName;
         user.CreatedBy = authorUsername;
-        user.CreatedOn = DateTime.UtcNow;
     }
 }
