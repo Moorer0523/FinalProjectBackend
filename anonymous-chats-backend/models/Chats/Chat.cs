@@ -10,8 +10,4 @@ public class Chat : BaseModel
 
     [Required]
     public int GroupId { get; set; }
-
-    [Required]
-    [DataType(DataType.DateTime)]
-    public DateTime StartDate { get; set; }
 }
