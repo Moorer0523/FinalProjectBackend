@@ -2,19 +2,31 @@
 using anonymous_chats_backend.Models;
 using anonymous_chats_backend.Models.Chats;
 using anonymous_chats_backend.Models.Chats.Dto;
+using anonymous_chats_backend.Hubs;
 using anonymous_chats_backend.Models.Groups;
 using anonymous_chats_backend.Models.Users;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace anonymous_chats_backend.Services;
 
 
-public class ChatService(AnonymousDbContext context) : IChatService
+public class ChatService : IChatService
 {
-    private readonly AnonymousDbContext _context = context;
-    private readonly GroupService _groupService = new(context);
+    private readonly AnonymousDbContext _context;
+    private readonly GroupService _groupService;
+    private readonly IHubContext<ChatHub> _hubContext;
+
+    public ChatService(AnonymousDbContext context, IHubContext<ChatHub> hubContext)
+    {
+        _context = context;
+        _groupService = new(context);
+        _hubContext = hubContext;
+    }
+
+
 
     public async Task<Chat?> GetChatById(int chatId)
     {
@@ -114,13 +126,19 @@ public class ChatService(AnonymousDbContext context) : IChatService
     
 
 
-    public async Task CreateChatMessage(CreateChatMessageDTO chatMessageDTO, string authorUsername)
+    public async Task<ChatMessage> CreateChatMessage(CreateChatMessageDTO chatMessageDTO, string authorUsername)
     {
         ChatMessage msg = new ChatMessage();
         msg.CreateToChatMessage(chatMessageDTO, authorUsername);
 
         await _context.ChatMessages.AddAsync(msg);
         await _context.SaveChangesAsync();
+
+        // Relay message to other users in the chat
+        string chatGroupName = ChatHub.GetGroupName(msg.ChatId);
+        await _hubContext.Clients.Group(chatGroupName).SendAsync("ReceiveMessage", msg);
+
+        return msg;
     }
 
 
