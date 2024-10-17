@@ -7,7 +7,7 @@ namespace anonymous_chats_backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize] --REMOVE AFTER MVP
+    [Authorize]
     public class ApiBaseController : ControllerBase
     {
         protected string GetCurrentUserID()
@@ -22,8 +22,7 @@ namespace anonymous_chats_backend.Controllers
                 }
             }
 
-            return "1";  // --REMOVE AFTER MVP
-            // return null;
+             return null;
         }
     }
 }
