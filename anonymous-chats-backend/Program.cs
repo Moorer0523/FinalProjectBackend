@@ -63,7 +63,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowLocalAngularApp");
-app.UseCors("AllowLocalAngularApp");
 
 app.MapHub<ChatHub>("/ChatHub");
 
