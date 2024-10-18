@@ -18,7 +18,7 @@ public interface IChatService
 
     public Task<List<Chat>> CreateChats(int groupId, string requestingUserId);
 
-    public Task CreateChatMessage(CreateChatMessageDTO chatMessageDTO, string authorUsername);
+    public Task<ChatMessage> CreateChatMessage(CreateChatMessageDTO chatMessageDTO, string authorUsername);
 
     public Task UpdateChatGuess(UpdateChatGuessDTO chatGuessDTO, string authorUsername);
 

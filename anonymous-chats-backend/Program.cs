@@ -2,17 +2,17 @@ using Microsoft.EntityFrameworkCore;
 using anonymous_chats_backend.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using anonymous_chats_backend;
-using System;
 using Microsoft.AspNetCore.Diagnostics;
+using anonymous_chats_backend.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 builder.Services.AddDbContext<AnonymousDbContext>(x => x.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -25,7 +25,8 @@ builder.Services.AddCors(options =>
             "https://anonymouschatsfrontend-secondary.z13.web.core.windows.net/", 
             "https://dev-2lj715snuhzz1p1e.us.auth0.com")
         .AllowAnyMethod()
-        .AllowAnyHeader();
+        .AllowAnyHeader()
+        .AllowCredentials();
 
     });
 });
@@ -59,10 +60,11 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-
 }
 
 app.UseCors("AllowLocalAngularApp");
+
+app.MapHub<ChatHub>("/ChatHub");
 
 app.UseHttpsRedirection();
 

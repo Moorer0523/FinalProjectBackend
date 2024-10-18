@@ -1,4 +1,5 @@
 ﻿using anonymous_chats_backend.Data;
+using anonymous_chats_backend.Hubs;
 using anonymous_chats_backend.Models.Chats;
 using anonymous_chats_backend.Models.Chats.Dto;
 using anonymous_chats_backend.Models.Groups;
@@ -7,6 +8,7 @@ using anonymous_chats_backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -18,9 +20,9 @@ public class ChatController : ApiBaseController
 {
     private readonly ChatService _chatService;
 
-    public ChatController(AnonymousDbContext context)
+    public ChatController(AnonymousDbContext context, IHubContext<ChatHub> hubContext)
     {
-        _chatService = new(context);
+        _chatService = new(context, hubContext);
     }
 
 
@@ -142,9 +144,9 @@ public class ChatController : ApiBaseController
             return BadRequest("Invalid request body");
         }
 
-        await _chatService.CreateChatMessage(chatMessageDTO, GetCurrentUserID());
+        ChatMessage msg = await _chatService.CreateChatMessage(chatMessageDTO, GetCurrentUserID());
 
-        return Created();
+        return Ok(msg);
     }
 
 
