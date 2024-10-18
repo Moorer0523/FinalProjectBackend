@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using anonymous_chats_backend.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using anonymous_chats_backend;
+using System;
+using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +20,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowLocalAngularApp", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins(
+            "http://localhost:4200", 
+            "https://anonymouschatsfrontend-secondary.z13.web.core.windows.net/", 
+            "https://dev-2lj715snuhzz1p1e.us.auth0.com")
         .AllowAnyMethod()
         .AllowAnyHeader();
 
@@ -43,6 +48,12 @@ builder.Services.AddCustomSwagger();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AnonymousDbContext>();
+    dbContext.Database.Migrate();  // Applies any pending migrations to the database
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -57,6 +68,22 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseExceptionHandler(errorApp => 
+{ 
+    errorApp.Run(async context => 
+    { 
+        var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+        var exception = exceptionHandlerPathFeature?.Error;
+        if (exception != null)
+        {
+            var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+            logger.LogError(exception, "Unhandled exception occurred.");
+        } 
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsync("An unexpected error occurred. Please try again later."); 
+    }); 
+});
 
 app.MapControllers();
 
