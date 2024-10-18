@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using anonymous_chats_backend.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using anonymous_chats_backend;
-using System;
 using Microsoft.AspNetCore.Diagnostics;
 using anonymous_chats_backend.Hubs;
 
