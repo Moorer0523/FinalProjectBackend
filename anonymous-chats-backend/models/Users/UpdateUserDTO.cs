@@ -18,6 +18,11 @@ public class UpdateUserDTO
 
 public class CreateUserDTO
 {
+    [Key, DatabaseGenerated(DatabaseGeneratedOption.None)] // Disabled auto increment
+    [Required]
+    [MaxLength(255)]
+    public string Id { get; set; }
+
     [Required]
     [MinLength(8)]
     [MaxLength(24)]
