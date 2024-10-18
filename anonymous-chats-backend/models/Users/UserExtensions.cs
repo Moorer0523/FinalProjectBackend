@@ -11,11 +11,11 @@ public static class UserExtensions
 
     }
 
-    public static void CreateToUser(this User user, CreateUserDTO createUserDTO, string authorUsername)
+    public static void CreateToUser(this User user, CreateUserDTO createUserDTO)
     {
-        user.Id = authorUsername;
+        user.Id = createUserDTO.Id;
         user.Email = createUserDTO.Email;
         user.UserName = createUserDTO.UserName;
-        user.CreatedBy = authorUsername;
+        user.CreatedBy = createUserDTO.Id;
     }
 }

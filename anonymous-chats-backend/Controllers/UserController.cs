@@ -47,12 +47,12 @@ public class UserController : ApiBaseController
     [HttpPost]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserDTO user)
     {
-
-        if (await _context.Users.FindAsync(GetCurrentUserID()) != null)
-            return BadRequest(user);
+        //removing as the post request auth information from Auth0 does not contain the userID
+        //if (await _context.Users.FindAsync(GetCurrentUserID()) != null)
+        //    return BadRequest(user);
 
         User newUser = new();
-        newUser.CreateToUser(user, GetCurrentUserID());
+        newUser.CreateToUser(user);
 
         _context.Users.Add(newUser);
         await _context.SaveChangesAsync();
