@@ -7,7 +7,6 @@ public class UpdateChatGuessDTO
     [Required]
     public int Id { get; set; }
 
-    [Required]
     [MaxLength(255)]
-    public string GuesseeId { get; set; }
+    public string? GuesseeId { get; set; } = null;
 }
