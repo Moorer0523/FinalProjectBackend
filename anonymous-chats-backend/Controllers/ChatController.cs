@@ -106,8 +106,8 @@ public class ChatController : ApiBaseController
 
 
 
-    // POST api/<ChatController>/Chats
-    [HttpPost("Chats")]
+    // POST api/<ChatController>/Chats/groupId=1
+    [HttpPost("Chats/groupId={groupId}")]
     public async Task<IActionResult> CreateChats(int groupId)
     {
         try

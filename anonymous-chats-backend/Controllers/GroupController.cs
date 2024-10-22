@@ -21,8 +21,9 @@ public class GroupController : ApiBaseController
     {
         _groupService = new(context);
     }
-    
-    
+
+
+    // GET api/<GroupController>/5
     [HttpGet("{groupId}", Name = "GetGroup")]
     public async Task<IActionResult> GetGroup(int groupId)
     {
@@ -32,7 +33,9 @@ public class GroupController : ApiBaseController
             return NotFound();
         return Ok(group);
     }
-    // GET api/<GroupController>/5
+
+
+    // GET api/<GroupController>/GetUserGroups/5
     [HttpGet("GetUserGroups/{userId}")]
     public async Task<IActionResult> GetUserGroups(string userId)
     {
@@ -43,6 +46,7 @@ public class GroupController : ApiBaseController
         return Ok(group);
     }
 
+    // GET api/<GroupController>/GetGroupUsers/5
     [HttpGet("GetGroupUsers/{groupId}")]
     public async Task<IActionResult> GetGroupUsers(int groupId)
     {
@@ -52,6 +56,7 @@ public class GroupController : ApiBaseController
             return NotFound();
         return Ok(users);
     }
+
 
     // POST api/<GroupController>
     [HttpPost]
@@ -64,6 +69,7 @@ public class GroupController : ApiBaseController
         return CreatedAtRoute(nameof(GetGroup),  new {groupId = group.Id }, group);
     }
 
+
     // PUT api/<GroupController>/5
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateGroup(int id, [FromBody] UpdateGroupDTO updateGroupDTO)
@@ -71,9 +77,10 @@ public class GroupController : ApiBaseController
         return Ok(await _groupService.UpdateGroup(id, updateGroupDTO, GetCurrentUserID()));
     }
 
+
     // DELETE api/<GroupController>/5
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> DeleteGroup(int id)
     {
         if(await _groupService.DeleteGroup(id, GetCurrentUserID()))
             return NoContent();
