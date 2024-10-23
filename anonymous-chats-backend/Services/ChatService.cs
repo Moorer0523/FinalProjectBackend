@@ -154,17 +154,10 @@ public class ChatService : IChatService
             {
                 ChatUser chatUser = new();
 
-                //swapped over to use chat groups to match the groupings of the users instead of alphebetical that the userIds is in currently.
                 chatUser.CreateToChatUser(chatGroups[i][j],     // UserId
                                           chatObjects[i].Id,    // ChatId
                                           pseudonyms[userIdx]); // Pseudonym
                 await _context.ChatUsers.AddAsync(chatUser);
-
-                ////something is off here. old code testing new fix
-                //chatUser.CreateToChatUser(userIds[userIdx],     // UserId
-                //                          chatObjects[i].Id,    // ChatId
-                //                          pseudonyms[userIdx]); // Pseudonym
-                //await _context.ChatUsers.AddAsync(chatUser);
 
                 userIdx++;
 
