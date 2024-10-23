@@ -154,7 +154,7 @@ public class ChatService : IChatService
             {
                 ChatUser chatUser = new();
 
-                //something is off here.
+                //swapped over to use chat groups to match the groupings of the users instead of alphebetical that the userIds is in currently.
                 chatUser.CreateToChatUser(chatGroups[i][j],     // UserId
                                           chatObjects[i].Id,    // ChatId
                                           pseudonyms[userIdx]); // Pseudonym
