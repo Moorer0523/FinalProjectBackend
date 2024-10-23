@@ -153,10 +153,18 @@ public class ChatService : IChatService
             for (int j = 0; j < chatGroups[i].Length; j++)
             {
                 ChatUser chatUser = new();
-                chatUser.CreateToChatUser(userIds[userIdx],     // UserId
+
+                //something is off here.
+                chatUser.CreateToChatUser(chatGroups[i][j],     // UserId
                                           chatObjects[i].Id,    // ChatId
                                           pseudonyms[userIdx]); // Pseudonym
                 await _context.ChatUsers.AddAsync(chatUser);
+
+                ////something is off here. old code testing new fix
+                //chatUser.CreateToChatUser(userIds[userIdx],     // UserId
+                //                          chatObjects[i].Id,    // ChatId
+                //                          pseudonyms[userIdx]); // Pseudonym
+                //await _context.ChatUsers.AddAsync(chatUser);
 
                 userIdx++;
 
