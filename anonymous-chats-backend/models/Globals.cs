@@ -2,5 +2,5 @@
 
 public static class Globals
 {
-    public const UInt16 MIN_GROUP_SIZE = 10;
+    public const UInt16 MIN_GROUP_SIZE = 6;
 }
