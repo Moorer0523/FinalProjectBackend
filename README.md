@@ -1,0 +1,1 @@
+WhoDis is a social deduction messaging app designed to strengthen your connections without the hassle of coordinating everyone’s schedules. This is the repo for the project backend. the frontend can be accessed here: https://github.com/szali172/anonymous-chats-frontend
