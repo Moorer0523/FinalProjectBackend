@@ -252,18 +252,28 @@ public class ChatService : IChatService
         // Randomize user order
         Random rnd = new Random();
         userIds = userIds.OrderBy(_ => rnd.Next()).ToList();
+        List<string[]> chatGroups;
 
-        // Divide users into random groups with a minimum size
-        List<string[]> chatGroups = userIds.Chunk(minChatSize).ToList();
-
-        // Disperse leftover users into existing random groups
-        foreach (string remainder in chatGroups.Last())
+        if (userIds.Count == 6) // Temporary bandaid :(
         {
-            int accomodatingChatIdx = rnd.Next(0, chatGroups.Count - 1);
-            chatGroups[accomodatingChatIdx] = chatGroups[accomodatingChatIdx].Append(remainder).ToArray();
+            chatGroups = new() { 
+                userIds.Slice(0, 3).ToArray(), 
+                userIds.Slice(3, 3).ToArray() 
+            };
         }
-        chatGroups.RemoveAt(chatGroups.Count - 1);
+        else
+        {
+            // Divide users into random groups with a minimum size
+            chatGroups = userIds.Chunk(minChatSize).ToList();
 
+            // Disperse leftover users into existing random groups
+            foreach (string remainder in chatGroups.Last())
+            {
+                int accomodatingChatIdx = rnd.Next(0, chatGroups.Count - 1);
+                chatGroups[accomodatingChatIdx] = chatGroups[accomodatingChatIdx].Append(remainder).ToArray();
+            }
+            chatGroups.RemoveAt(chatGroups.Count - 1);
+        }
         return chatGroups;
     }
 

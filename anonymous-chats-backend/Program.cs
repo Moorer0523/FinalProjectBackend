@@ -21,8 +21,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowLocalAngularApp", policy =>
     {
         policy.WithOrigins(
-            "http://localhost:4200", 
-            "https://anonymouschatsfrontend-secondary.z13.web.core.windows.net/", 
+            "http://localhost:4200",
+            "https://anonymouschatsfrontend.z13.web.core.windows.net", 
             "https://dev-2lj715snuhzz1p1e.us.auth0.com")
         .AllowAnyMethod()
         .AllowAnyHeader()
